@@ -23,6 +23,8 @@ namespace GhostGameServer
     private int port { get; set; }
     private TcpListener server { get; set; }
     private TcpClient client { get; set; } = default(TcpClient);
+
+    private List<TcpClient> users = new List<TcpClient>();
    
     public ServerManager(IPAddress ip, int port)
     {
@@ -53,7 +55,31 @@ namespace GhostGameServer
 
         stream.Read(recievedBuffer, 0, recievedBuffer.Length);
 
-        string msg = Encoding.ASCII.GetString(recievedBuffer, 0, recievedBuffer.Length);
+        StringBuilder message = new StringBuilder();
+
+        foreach (byte b in recievedBuffer)
+        {
+          if (b.Equals(00))
+          {
+            break;
+          }
+          else
+          {
+            message.Append(Convert.ToChar(b));
+          }
+        }
+
+        if (!users.Contains(client))
+        {
+          users.Add(client);
+          Console.WriteLine(message.ToString() + " has just connected...");
+        }
+        else
+        {
+          Console.WriteLine("ALready Connected !!!");
+        }
+
+        
       }
     }
   }
