@@ -22,7 +22,8 @@ namespace GhostGameServer
     private IPAddress ip { get; set; }
     private int port { get; set; }
     private TcpListener server { get; set; }
-
+    private TcpClient client { get; set; } = default(TcpClient);
+   
     public ServerManager(IPAddress ip, int port)
     {
       this.ip = ip;
@@ -41,6 +42,18 @@ namespace GhostGameServer
       {
         Console.WriteLine(ex.ToString());
         
+      }
+
+      while (true)
+      {
+        client = server.AcceptTcpClient();
+
+        byte[] recievedBuffer = new byte[100];
+        NetworkStream stream = client.GetStream();
+
+        stream.Read(recievedBuffer, 0, recievedBuffer.Length);
+
+        string msg = Encoding.ASCII.GetString(recievedBuffer, 0, recievedBuffer.Length);
       }
     }
   }
