@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace GhostGameClient
 {
@@ -17,6 +18,9 @@ namespace GhostGameClient
 
     private string serverIP = "localhost";
     private int port = 8080;
+    private NetworkStream serverStream = default(NetworkStream);
+    private TcpClient client = new TcpClient();
+    private string returnData;
 
     public Form1()
     {
@@ -25,7 +29,7 @@ namespace GhostGameClient
 
     private void button1_Click(object sender, EventArgs e)
     {
-      TcpClient client = new TcpClient(serverIP, port);
+      client = new TcpClient(serverIP, port);
 
       int byteCount = Encoding.ASCII.GetByteCount(nameBox.Text);
 
@@ -33,14 +37,47 @@ namespace GhostGameClient
 
       sendData = Encoding.ASCII.GetBytes(nameBox.Text);
 
-      NetworkStream stream = client.GetStream();
+      serverStream = client.GetStream();
 
-      stream.Write(sendData, 0, sendData.Length);
+      serverStream.Write(sendData, 0, sendData.Length);
 
-      stream.Close();
-      client.Close();
+      serverStream.Flush();
+
+      Thread clientThread = new Thread(getMessage);
+      clientThread.Start();
 
 
+
+    }
+    private void getMessage()
+    {
+      while (true)
+
+      {
+
+        serverStream = client.GetStream();
+
+        int buffSize = 0;
+
+        byte[] inStream = new byte[10025];
+
+        buffSize = client.ReceiveBufferSize;
+
+        serverStream.Read(inStream, 0, 255);
+
+        returnData = System.Text.Encoding.ASCII.GetString(inStream);
+
+        messageWrite();
+      }
+      
+    }
+    private void messageWrite()
+    {
+
+      if (this.InvokeRequired)
+        this.Invoke(new MethodInvoker(messageWrite));
+      else
+        output.Text = output.Text + Environment.NewLine + " >> " + returnData;
 
     }
   }
