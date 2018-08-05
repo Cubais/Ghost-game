@@ -28,46 +28,70 @@
     /// </summary>
     private void InitializeComponent()
     {
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
       this.nameBox = new System.Windows.Forms.TextBox();
       this.button1 = new System.Windows.Forms.Button();
       this.output = new System.Windows.Forms.TextBox();
+      this.StartGame = new System.Windows.Forms.Button();
+      this.NameLabel = new System.Windows.Forms.Label();
       this.SuspendLayout();
       // 
       // nameBox
       // 
-      this.nameBox.Location = new System.Drawing.Point(176, 124);
+      this.nameBox.Location = new System.Drawing.Point(843, 12);
       this.nameBox.Name = "nameBox";
-      this.nameBox.Size = new System.Drawing.Size(462, 22);
+      this.nameBox.Size = new System.Drawing.Size(113, 22);
       this.nameBox.TabIndex = 0;
       // 
       // button1
       // 
-      this.button1.Location = new System.Drawing.Point(314, 152);
+      this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
+      this.button1.Location = new System.Drawing.Point(843, 40);
       this.button1.Name = "button1";
-      this.button1.Size = new System.Drawing.Size(158, 62);
+      this.button1.Size = new System.Drawing.Size(110, 47);
       this.button1.TabIndex = 1;
-      this.button1.Text = "Connect";
       this.button1.UseVisualStyleBackColor = true;
       this.button1.Click += new System.EventHandler(this.button1_Click);
       // 
       // output
       // 
-      this.output.Location = new System.Drawing.Point(164, 220);
+      this.output.Location = new System.Drawing.Point(795, 93);
       this.output.Multiline = true;
       this.output.Name = "output";
-      this.output.Size = new System.Drawing.Size(462, 189);
+      this.output.Size = new System.Drawing.Size(161, 361);
       this.output.TabIndex = 2;
+      // 
+      // StartGame
+      // 
+      this.StartGame.Image = ((System.Drawing.Image)(resources.GetObject("StartGame.Image")));
+      this.StartGame.Location = new System.Drawing.Point(795, 460);
+      this.StartGame.Name = "StartGame";
+      this.StartGame.Size = new System.Drawing.Size(160, 70);
+      this.StartGame.TabIndex = 3;
+      this.StartGame.UseVisualStyleBackColor = true;
+      // 
+      // NameLabel
+      // 
+      this.NameLabel.AutoSize = true;
+      this.NameLabel.Location = new System.Drawing.Point(792, 12);
+      this.NameLabel.Name = "NameLabel";
+      this.NameLabel.Size = new System.Drawing.Size(45, 17);
+      this.NameLabel.TabIndex = 4;
+      this.NameLabel.Text = "Name";
       // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(800, 450);
+      this.ClientSize = new System.Drawing.Size(968, 568);
+      this.Controls.Add(this.NameLabel);
+      this.Controls.Add(this.StartGame);
       this.Controls.Add(this.output);
       this.Controls.Add(this.button1);
       this.Controls.Add(this.nameBox);
       this.Name = "Form1";
       this.Text = "Form1";
+      this.Load += new System.EventHandler(this.Form1_Load);
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -78,6 +102,8 @@
     private System.Windows.Forms.TextBox nameBox;
     private System.Windows.Forms.Button button1;
     private System.Windows.Forms.TextBox output;
+    private System.Windows.Forms.Button StartGame;
+    private System.Windows.Forms.Label NameLabel;
   }
 }
 
