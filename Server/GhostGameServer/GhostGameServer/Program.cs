@@ -26,8 +26,7 @@ namespace GhostGameServer
     private TcpListener server { get; set; }
     private TcpClient client { get; set; } = default(TcpClient);
     private Hashtable clientsList = new Hashtable();
-    private List<TcpClient> users = new List<TcpClient>();
-   
+       
     public ServerManager(IPAddress ip, int port)
     {
       this.ip = ip;
@@ -70,19 +69,20 @@ namespace GhostGameServer
             message.Append(Convert.ToChar(b));
           }
         }
-        
-        if (!clientsList.Contains(message.ToString()))
+        string clientName = message.ToString();
+        if (!clientsList.Contains(clientName))
         {
           //TODO Hashovanie users
           //adding new client to list
-          clientsList.Add(message.ToString(), client); 
+          clientsList.Add(clientName, client); 
 
           //send all clients that new client has been connected
-          Broadcast("User " + message.ToString(), message.ToString()); 
+          Broadcast("User " + clientName, clientName);
+          Console.WriteLine(clientName + "connected");
 
           HandleClinet clientHandler = new HandleClinet();
 
-          clientHandler.startClient(client, message.ToString(), clientsList, this);
+          clientHandler.startClient(client, clientName, clientsList, this);
           
         }
         else
@@ -99,27 +99,46 @@ namespace GhostGameServer
     }
     public void Broadcast(string message, string userName)
     {
-      foreach (DictionaryEntry item in clientsList)
+      try
       {
-        TcpClient broadcastSocket;
+        foreach (DictionaryEntry item in clientsList)
+        {
 
-        broadcastSocket = (TcpClient)item.Value;
+          TcpClient broadcastSocket;
 
-        NetworkStream broadcastStream = broadcastSocket.GetStream();
+          broadcastSocket = (TcpClient)item.Value;
 
-        byte[] broadcastBytes = null;
+          if (!broadcastSocket.Connected)
+            continue;          
 
-        broadcastBytes = Encoding.ASCII.GetBytes(message.ToString() + " has just connected...");
+          NetworkStream broadcastStream = broadcastSocket.GetStream();
 
-        broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
+          byte[] broadcastBytes = null;
 
-        broadcastStream.Flush();
+          broadcastBytes = Encoding.ASCII.GetBytes(userName + ": " + message.ToString());
+
+          broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
+
+          broadcastStream.Flush();
+
+
+        }
+      }
+      catch
+      {
+        Console.WriteLine("Unable to broadcast");
       }
 
     }
+    public void RemoveClient(string clientName)
+    {
+      clientsList.Remove(clientName);
+      Broadcast("has just disconected",clientName);
+      Console.WriteLine(clientName + " disconnected");
+    }
   }
 
-  public class HandleClinet
+  public class HandleClinet : IDisposable
   {
     TcpClient clientSocket;
 
@@ -129,6 +148,18 @@ namespace GhostGameServer
 
     ServerManager serverManager;
 
+    bool connected = false;
+
+    public void Dispose()
+    {      
+      serverManager.RemoveClient(clNo);
+      this.clientSocket = null;
+      this.clientsList = null;
+      this.serverManager = null;
+      connected = false;
+      
+    }
+
     public void startClient(TcpClient inClientSocket, string clineNo, Hashtable cList, ServerManager serverManager)
     {
       this.clientSocket = inClientSocket;
@@ -137,6 +168,7 @@ namespace GhostGameServer
       this.serverManager = serverManager;
       Thread ctThread = new Thread(doChat);
       ctThread.Start();
+      connected = true;
 
     }
     private void doChat()
@@ -144,7 +176,7 @@ namespace GhostGameServer
       byte[] bytesFrom = new byte[10025];
       string dataFromClient = null;  
       
-      while ((true))
+      while (clientSocket.Connected)
       {
         try
         {
@@ -164,6 +196,10 @@ namespace GhostGameServer
         catch (Exception ex)
         {
           Console.WriteLine(ex.ToString());
+        }
+        finally
+        {
+          this.Dispose();          
         }
 
       }//end while
