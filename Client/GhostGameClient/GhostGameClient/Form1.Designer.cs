@@ -38,42 +38,43 @@
       // 
       // nameBox
       // 
-      this.nameBox.Location = new System.Drawing.Point(843, 12);
+      this.nameBox.Location = new System.Drawing.Point(63, 11);
       this.nameBox.Name = "nameBox";
-      this.nameBox.Size = new System.Drawing.Size(113, 22);
+      this.nameBox.Size = new System.Drawing.Size(246, 22);
       this.nameBox.TabIndex = 0;
       // 
       // button1
       // 
       this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
-      this.button1.Location = new System.Drawing.Point(843, 40);
+      this.button1.Location = new System.Drawing.Point(63, 39);
       this.button1.Name = "button1";
-      this.button1.Size = new System.Drawing.Size(110, 47);
+      this.button1.Size = new System.Drawing.Size(246, 47);
       this.button1.TabIndex = 1;
       this.button1.UseVisualStyleBackColor = true;
       this.button1.Click += new System.EventHandler(this.button1_Click);
       // 
       // output
       // 
-      this.output.Location = new System.Drawing.Point(795, 93);
+      this.output.Location = new System.Drawing.Point(12, 92);
       this.output.Multiline = true;
       this.output.Name = "output";
-      this.output.Size = new System.Drawing.Size(161, 361);
+      this.output.Size = new System.Drawing.Size(297, 361);
       this.output.TabIndex = 2;
       // 
       // StartGame
       // 
       this.StartGame.Image = ((System.Drawing.Image)(resources.GetObject("StartGame.Image")));
-      this.StartGame.Location = new System.Drawing.Point(795, 460);
+      this.StartGame.Location = new System.Drawing.Point(15, 459);
       this.StartGame.Name = "StartGame";
-      this.StartGame.Size = new System.Drawing.Size(160, 70);
+      this.StartGame.Size = new System.Drawing.Size(294, 145);
       this.StartGame.TabIndex = 3;
       this.StartGame.UseVisualStyleBackColor = true;
+      this.StartGame.Click += new System.EventHandler(this.StartGame_Click);
       // 
       // NameLabel
       // 
       this.NameLabel.AutoSize = true;
-      this.NameLabel.Location = new System.Drawing.Point(792, 12);
+      this.NameLabel.Location = new System.Drawing.Point(12, 11);
       this.NameLabel.Name = "NameLabel";
       this.NameLabel.Size = new System.Drawing.Size(45, 17);
       this.NameLabel.TabIndex = 4;
@@ -83,7 +84,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(968, 568);
+      this.ClientSize = new System.Drawing.Size(321, 616);
       this.Controls.Add(this.NameLabel);
       this.Controls.Add(this.StartGame);
       this.Controls.Add(this.output);

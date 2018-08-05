@@ -67,15 +67,15 @@ namespace GhostGameClient
 
         returnData = System.Text.Encoding.ASCII.GetString(inStream);
 
-        messageWrite();
+        MessageWrite();
       }
       
     }
-    private void messageWrite()
+    private void MessageWrite()
     {
 
       if (this.InvokeRequired)
-        this.Invoke(new MethodInvoker(messageWrite));
+        this.Invoke(new MethodInvoker(MessageWrite));
       else
         output.Text = output.Text + Environment.NewLine + " >> " + returnData;
 
@@ -83,6 +83,14 @@ namespace GhostGameClient
 
     private void Form1_Load(object sender, EventArgs e)
     {
+
+    }
+
+    private void StartGame_Click(object sender, EventArgs e)
+    {
+      GhostGamePlayer.Game newGame = new GhostGamePlayer.Game();
+
+      newGame.Show();
 
     }
   }

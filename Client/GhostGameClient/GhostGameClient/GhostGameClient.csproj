@@ -78,5 +78,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GhostGamePlayer\GhostGamePlayer.csproj">
+      <Project>{3aa401db-c5e1-4b75-935c-0e6e0d98d805}</Project>
+      <Name>GhostGamePlayer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
