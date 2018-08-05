@@ -28,36 +28,52 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.label1 = new System.Windows.Forms.Label();
-      this.button1 = new System.Windows.Forms.Button();
+      this.components = new System.ComponentModel.Container();
+      this.Exit = new System.Windows.Forms.Button();
+      this.Score = new System.Windows.Forms.LinkLabel();
+      this.output = new System.Windows.Forms.TextBox();
+      this.GameTimer = new System.Windows.Forms.Timer(this.components);
       this.SuspendLayout();
       // 
-      // label1
+      // Exit
       // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(358, 183);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(46, 17);
-      this.label1.TabIndex = 0;
-      this.label1.Text = "label1";
+      this.Exit.Location = new System.Drawing.Point(658, 12);
+      this.Exit.Name = "Exit";
+      this.Exit.Size = new System.Drawing.Size(130, 40);
+      this.Exit.TabIndex = 1;
+      this.Exit.Text = "EXIT";
+      this.Exit.UseVisualStyleBackColor = true;
+      this.Exit.Click += new System.EventHandler(this.button1_Click);
       // 
-      // button1
+      // Score
       // 
-      this.button1.Location = new System.Drawing.Point(329, 244);
-      this.button1.Name = "button1";
-      this.button1.Size = new System.Drawing.Size(232, 147);
-      this.button1.TabIndex = 1;
-      this.button1.Text = "button1";
-      this.button1.UseVisualStyleBackColor = true;
-      this.button1.Click += new System.EventHandler(this.button1_Click);
+      this.Score.AutoSize = true;
+      this.Score.Location = new System.Drawing.Point(12, 9);
+      this.Score.Name = "Score";
+      this.Score.Size = new System.Drawing.Size(0, 17);
+      this.Score.TabIndex = 2;
+      // 
+      // output
+      // 
+      this.output.Location = new System.Drawing.Point(228, 12);
+      this.output.Multiline = true;
+      this.output.Name = "output";
+      this.output.Size = new System.Drawing.Size(268, 148);
+      this.output.TabIndex = 3;
+      // 
+      // GameTimer
+      // 
+      this.GameTimer.Interval = 20;
+      this.GameTimer.Tick += new System.EventHandler(this.GameTimer_Tick);
       // 
       // Game
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(800, 450);
-      this.Controls.Add(this.button1);
-      this.Controls.Add(this.label1);
+      this.Controls.Add(this.output);
+      this.Controls.Add(this.Score);
+      this.Controls.Add(this.Exit);
       this.Name = "Game";
       this.Text = "Form1";
       this.Load += new System.EventHandler(this.Game_Load);
@@ -67,9 +83,10 @@
     }
 
     #endregion
-
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.Button button1;
+    private System.Windows.Forms.Button Exit;
+    private System.Windows.Forms.LinkLabel Score;
+    private System.Windows.Forms.TextBox output;
+    private System.Windows.Forms.Timer GameTimer;
   }
 }
 

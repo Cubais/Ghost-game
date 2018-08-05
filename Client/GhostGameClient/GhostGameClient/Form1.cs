@@ -73,12 +73,10 @@ namespace GhostGameClient
     }
     private void MessageWrite()
     {
-
       if (this.InvokeRequired)
         this.Invoke(new MethodInvoker(MessageWrite));
       else
         output.Text = output.Text + Environment.NewLine + " >> " + returnData;
-
     }
 
     private void Form1_Load(object sender, EventArgs e)
