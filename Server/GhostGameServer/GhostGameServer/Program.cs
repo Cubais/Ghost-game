@@ -73,9 +73,12 @@ namespace GhostGameServer
         
         if (!clientsList.Contains(message.ToString()))
         {
-          
-          clientsList.Add(message.ToString(), client);
-          Broadcast(message.ToString() + " Joined", message.ToString());
+          //TODO Hashovanie users
+          //adding new client to list
+          clientsList.Add(message.ToString(), client); 
+
+          //send all clients that new client has been connected
+          Broadcast("User " + message.ToString(), message.ToString()); 
 
           HandleClinet clientHandler = new HandleClinet();
 
@@ -118,7 +121,6 @@ namespace GhostGameServer
 
   public class HandleClinet
   {
-
     TcpClient clientSocket;
 
     string clNo;
@@ -137,33 +139,15 @@ namespace GhostGameServer
       ctThread.Start();
 
     }
-
-
-
     private void doChat()
-
     {
-
-      int requestCount = 0;
-
       byte[] bytesFrom = new byte[10025];
-
-      string dataFromClient = null;
+      string dataFromClient = null;  
       
-      requestCount = 0;
-
-
-
       while ((true))
-
       {
-
         try
-
         {
-
-          requestCount = requestCount + 1;
-
           NetworkStream networkStream = clientSocket.GetStream();
 
           networkStream.Read(bytesFrom, 0, 255);
@@ -177,13 +161,9 @@ namespace GhostGameServer
           serverManager.Broadcast(dataFromClient, clNo);
 
         }
-
         catch (Exception ex)
-
         {
-
           Console.WriteLine(ex.ToString());
-
         }
 
       }//end while
