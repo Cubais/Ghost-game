@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Sockets;
 
 using Newtonsoft.Json;
 
@@ -17,11 +19,26 @@ namespace GhostGamePlayer
   public partial class Game : Form
   {
     Player player;
+    private static NetworkStream ServerStream;
 
     public Game()
     {
       InitializeComponent();
+    }
+
+    public Game(NetworkStream serverStream)
+    {
+      InitializeComponent();
       player = new Player(this, 0, 0);
+      ServerStream = serverStream;
+      
+    }
+
+    public static void SendMessage(string data)
+    {
+      byte[] outStream = System.Text.Encoding.ASCII.GetBytes(data);
+      ServerStream.Write(outStream, 0, outStream.Length);
+      ServerStream.Flush();
     }
 
     private void Game_Load(object sender, EventArgs e)
@@ -56,6 +73,7 @@ namespace GhostGamePlayer
   {
     public int PositionX { get; set; }
     public int PositionY { get; set; }
+    public int PlayerID { get; set; }
     
     Form form;    
     Graphics g;
@@ -77,6 +95,9 @@ namespace GhostGamePlayer
         g.Clear(Color.White);
         g.DrawRectangle(new Pen(Color.Red), new Rectangle(PositionX, PositionY, 50, 50));
         changePosition = false;
+
+        Game.SendMessage(JsonConvert.SerializeObject(this, Formatting.Indented));      
+
       }
     }
 

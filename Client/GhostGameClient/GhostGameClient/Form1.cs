@@ -45,14 +45,10 @@ namespace GhostGameClient
 
       Thread clientThread = new Thread(getMessage);
       clientThread.Start();
-
-
-
-    }
+    }   
     private void getMessage()
     {
       while (true)
-
       {
 
         serverStream = client.GetStream();
@@ -86,7 +82,7 @@ namespace GhostGameClient
 
     private void StartGame_Click(object sender, EventArgs e)
     {
-      GhostGamePlayer.Game newGame = new GhostGamePlayer.Game();
+      GhostGamePlayer.Game newGame = new GhostGamePlayer.Game(this.serverStream);
 
       newGame.Show();
 
