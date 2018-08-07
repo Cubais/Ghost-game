@@ -60,7 +60,7 @@ namespace GhostGameServer
 
         foreach (byte b in recievedBuffer)
         {
-          if (b.Equals(00))
+          if (b.Equals('}'))
           {
             break;
           }
@@ -147,16 +147,13 @@ namespace GhostGameServer
     Hashtable clientsList;
 
     ServerManager serverManager;
-
-    bool connected = false;
-
+        
     public void Dispose()
     {      
       serverManager.RemoveClient(clNo);
       this.clientSocket = null;
       this.clientsList = null;
-      this.serverManager = null;
-      connected = false;
+      this.serverManager = null;     
       
     }
 
@@ -168,15 +165,17 @@ namespace GhostGameServer
       this.serverManager = serverManager;
       Thread ctThread = new Thread(doChat);
       ctThread.Start();
-      connected = true;
-
+     
     }
     private void doChat()
     {
+      if (clientsList.Count == 0) // waiting for new client
+        return;
+
       byte[] bytesFrom = new byte[10025];
       string dataFromClient = null;  
       
-      while (clientSocket.Connected)
+      while (clientSocket != null && clientSocket.Connected)
       {
         try
         {
@@ -186,7 +185,7 @@ namespace GhostGameServer
 
           dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
 
-          dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf(" "));
+          dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("}")+1);
 
           Console.WriteLine("From client - " + clNo + " : " + dataFromClient);
 
@@ -195,13 +194,10 @@ namespace GhostGameServer
         }
         catch (Exception ex)
         {
-          Console.WriteLine(ex.ToString());
+          //Console.WriteLine(ex.ToString());
+          this.Dispose();
         }
-        finally
-        {
-          this.Dispose();          
-        }
-
+       
       }//end while
 
     }//end doChat
