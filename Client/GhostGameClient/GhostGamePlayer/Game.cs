@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using Newtonsoft.Json;
 
 namespace GhostGamePlayer
 {
@@ -32,6 +35,8 @@ namespace GhostGamePlayer
 
     private void button1_Click(object sender, EventArgs e)
     {
+      //File.Create("output.txt");
+      //File.WriteAllText("output.txt", JsonConvert.SerializeObject(player, Formatting.Indented));
       this.Close();
     }
 
@@ -42,7 +47,8 @@ namespace GhostGamePlayer
 
     private void GameTimer_Tick(object sender, EventArgs e)
     {
-      player.Draw();
+      player.Draw();    
+      
     }    
   }
 
