@@ -26,10 +26,10 @@ namespace GhostGamePlayer
       InitializeComponent();
     }
 
-    public Game(NetworkStream serverStream)
+    public Game(NetworkStream serverStream, int playerID)
     {
       InitializeComponent();
-      player = new Player(this, 0, 0);
+      player = new Player(this, 0, 0, playerID);
       ServerStream = serverStream;
       
     }
@@ -81,12 +81,13 @@ namespace GhostGamePlayer
     private bool changePosition = true;
 
 
-    public Player(Form form,int posX,int posY)
+    public Player(Form form,int posX,int posY, int playerID)
     {     
       this.form = form;
       this.PositionX = posX;
       this.PositionY = posY;
       g = form.CreateGraphics();
+      PlayerID = playerID;
     }
 
     public void Draw()
