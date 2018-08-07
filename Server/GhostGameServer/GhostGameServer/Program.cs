@@ -71,13 +71,11 @@ namespace GhostGameServer
         }
         string clientName = message.ToString();
         if (!clientsList.Contains(clientName))
-        {
-          //TODO Hashovanie users
-          //adding new client to list
-          clientsList.Add(clientName, client); 
-
+        {          
+          clientsList.Add(clientName, client);
+          Send(stream, clientName.GetHashCode().ToString() + "@");
           //send all clients that new client has been connected
-          Broadcast("User " + clientName, clientName);
+          //Broadcast("User " + clientName, clientName);
           Console.WriteLine(clientName + "connected");
 
           HandleClinet clientHandler = new HandleClinet();
@@ -97,6 +95,7 @@ namespace GhostGameServer
       server.Stop();
 
     }
+   
     public void Broadcast(string message, string userName)
     {
       try
@@ -112,16 +111,7 @@ namespace GhostGameServer
             continue;          
 
           NetworkStream broadcastStream = broadcastSocket.GetStream();
-
-          byte[] broadcastBytes = null;
-
-          broadcastBytes = Encoding.ASCII.GetBytes(userName + ": " + message.ToString());
-
-          broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
-
-          broadcastStream.Flush();
-
-
+          Send(broadcastStream, userName + ": " + message);
         }
       }
       catch
@@ -129,6 +119,16 @@ namespace GhostGameServer
         Console.WriteLine("Unable to broadcast");
       }
 
+    }
+    private void Send(NetworkStream stream, string message)
+    {
+      byte[] broadcastBytes = null;
+
+      broadcastBytes = Encoding.ASCII.GetBytes(message);
+
+      stream.Write(broadcastBytes, 0, broadcastBytes.Length);
+
+      stream.Flush();
     }
     public void RemoveClient(string clientName)
     {
