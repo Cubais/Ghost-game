@@ -21,6 +21,7 @@ namespace GhostGameClient
     private NetworkStream serverStream = default(NetworkStream);
     private TcpClient client = new TcpClient();
     private string returnData;
+    private int playerID;
 
     public Form1()
     {
@@ -35,7 +36,7 @@ namespace GhostGameClient
 
       byte[] sendData = new byte[byteCount];
 
-      sendData = Encoding.ASCII.GetBytes(nameBox.Text);
+      sendData = Encoding.ASCII.GetBytes(nameBox.Text + '}');
 
       serverStream = client.GetStream();
 
@@ -63,6 +64,9 @@ namespace GhostGameClient
 
         returnData = System.Text.Encoding.ASCII.GetString(inStream);
 
+        if (returnData.IndexOf("@") != -1)
+          playerID = Int32.Parse(returnData.Substring(0, returnData.IndexOf('@')));
+
         MessageWrite();
       }
       
@@ -82,10 +86,18 @@ namespace GhostGameClient
 
     private void StartGame_Click(object sender, EventArgs e)
     {
-      GhostGamePlayer.Game newGame = new GhostGamePlayer.Game(this.serverStream);
+      GhostGamePlayer.Game newGame = new GhostGamePlayer.Game(this.serverStream, playerID);
 
       newGame.Show();
 
+    }
+
+    private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+    {
+      if(serverStream != null)
+        serverStream.Close();
+
+      Application.Exit();
     }
   }
 }
