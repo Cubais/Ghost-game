@@ -37,33 +37,7 @@ namespace GhostGamePlayer
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
-      switch (keyData)
-      {
-        case Keys.Left:
-          output.Text = "LEFT" + Environment.NewLine;
-          player.PositionX -= 5;
-          return true;
-          break;
-        case Keys.Up:
-          output.Text = "UP" + Environment.NewLine;
-          player.PositionY -= 5;
-          return true;
-          break;
-        case Keys.Right:
-          output.Text = "RIGHT" + Environment.NewLine;
-          player.PositionX += 5;
-          return true;
-          break;
-        case Keys.Down:
-          output.Text = "DOWN" + Environment.NewLine;
-          player.PositionY += 5;
-          return true;
-          break;
-        default:
-          output.Text = "ANOTHER" + Environment.NewLine;
-          return base.ProcessCmdKey(ref msg, keyData);
-          break;
-      }
+      return (!player.PlayerControl(keyData)) ? base.ProcessCmdKey(ref msg, keyData) : true;
     }
 
     private void GameTimer_Tick(object sender, EventArgs e)
@@ -80,6 +54,9 @@ namespace GhostGamePlayer
     Form form;    
     Graphics g;
 
+    private bool changePosition = true;
+
+
     public Player(Form form,int posX,int posY)
     {     
       this.form = form;
@@ -90,8 +67,42 @@ namespace GhostGamePlayer
 
     public void Draw()
     {
-      g.Clear(Color.White);
-      g.DrawRectangle(new Pen(Color.Red),new Rectangle(PositionX,PositionY,50,50));
+      if (changePosition)    {
+        g.Clear(Color.White);
+        g.DrawRectangle(new Pen(Color.Red), new Rectangle(PositionX, PositionY, 50, 50));
+        changePosition = false;
+      }
+    }
+
+    public bool PlayerControl(Keys keyData)
+    {
+      switch (keyData)
+      {
+        case Keys.Left:         
+            PositionX -= 5;
+            changePosition = true;
+          return true;
+
+        case Keys.Up:          
+            PositionY -= 5;
+            changePosition = true;
+          return true;
+
+        case Keys.Right:          
+            PositionX += 5;
+            changePosition = true;
+          return true;
+
+        case Keys.Down:          
+            PositionY += 5;
+            changePosition = true;
+          return true;
+
+        default:
+          changePosition = false;
+          return false;
+
+      }
     }
 
     
