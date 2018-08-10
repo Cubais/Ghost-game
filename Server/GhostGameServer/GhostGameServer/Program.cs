@@ -25,6 +25,7 @@ namespace GhostGameServer
     private int port { get; set; }
     private TcpListener server { get; set; }
     private TcpClient client { get; set; } = default(TcpClient);
+    private NetworkStream stream { get; set; }
     private Hashtable clientsList = new Hashtable();
        
     public ServerManager(IPAddress ip, int port)
@@ -52,7 +53,7 @@ namespace GhostGameServer
         client = server.AcceptTcpClient();
 
         byte[] recievedBuffer = new byte[100];
-        NetworkStream stream = client.GetStream();
+        stream = client.GetStream();
 
         stream.Read(recievedBuffer, 0, recievedBuffer.Length);
 
@@ -60,8 +61,12 @@ namespace GhostGameServer
 
         foreach (byte b in recievedBuffer)
         {
-          if (b.Equals('}'))
+          char zn = (char)b;
+          if (zn == '}' || zn == '$')
           {
+            if (zn == '$')
+              ConnectUser(message.ToString());
+
             break;
           }
           else
@@ -69,49 +74,59 @@ namespace GhostGameServer
             message.Append(Convert.ToChar(b));
           }
         }
-        string clientName = message.ToString();
-        if (!clientsList.Contains(clientName))
-        {          
-          clientsList.Add(clientName, client);
-          Send(stream, clientName.GetHashCode().ToString() + "@");
-          //send all clients that new client has been connected
-          //Broadcast("User " + clientName, clientName);
-          Console.WriteLine(clientName + "connected");
-
-          HandleClinet clientHandler = new HandleClinet();
-
-          clientHandler.startClient(client, clientName, clientsList, this);
-          
-        }
-        else
-        {
-          Console.WriteLine("Already Connected !!!");
-        }
-
-        
+              
       }
 
       client.Close();
       server.Stop();
 
     }
-   
+    /// <summary>
+    /// Adding user to clientList
+    /// </summary>
+    /// <param name="clientName">Name of the client</param>
+    private void ConnectUser(string clientName)
+    {
+      int encodeUser = clientName.GetHashCode();
+      if (!clientsList.Contains(encodeUser))
+      {
+        clientsList.Add(encodeUser, client);
+        Send(stream, encodeUser.ToString() + "@");
+        Console.WriteLine(clientName + "connected");
+
+        HandleClinet clientHandler = new HandleClinet();
+
+        clientHandler.startClient(client, clientName, clientsList, this);
+
+      }
+      else
+      {
+        Console.WriteLine("Already Connected !!!");
+      }
+
+    }
+   /// <summary>
+   /// Sending message to all connected users
+   /// </summary>
+   /// <param name="message">What to send</param>
+   /// <param name="userName">Who sends it</param>
     public void Broadcast(string message, string userName)
     {
       try
       {
         foreach (DictionaryEntry item in clientsList)
         {
+          // Skip sending message to it's sender
+          if ((int)item.Key == userName.GetHashCode())
+            continue;         
 
-          TcpClient broadcastSocket;
-
-          broadcastSocket = (TcpClient)item.Value;
+          TcpClient broadcastSocket = (TcpClient)item.Value;
 
           if (!broadcastSocket.Connected)
             continue;          
 
           NetworkStream broadcastStream = broadcastSocket.GetStream();
-          Send(broadcastStream, userName + ": " + message);
+          Send(broadcastStream, message);
         }
       }
       catch
@@ -120,6 +135,11 @@ namespace GhostGameServer
       }
 
     }
+    /// <summary>
+    /// Sending a message
+    /// </summary>
+    /// <param name="stream">Existing stream on which messages are send</param>
+    /// <param name="message">Message to send</param>
     private void Send(NetworkStream stream, string message)
     {
       byte[] broadcastBytes = null;
@@ -132,8 +152,7 @@ namespace GhostGameServer
     }
     public void RemoveClient(string clientName)
     {
-      clientsList.Remove(clientName);
-      Broadcast("has just disconected",clientName);
+      clientsList.Remove(clientName.GetHashCode());     
       Console.WriteLine(clientName + " disconnected");
     }
   }
@@ -189,10 +208,17 @@ namespace GhostGameServer
 
           Console.WriteLine("From client - " + clNo + " : " + dataFromClient);
 
+          // Client is disconnected
+          if (dataFromClient == "{Off}")
+          {
+            this.Dispose();
+            break;
+          }
+
           serverManager.Broadcast(dataFromClient, clNo);
 
         }
-        catch (Exception ex)
+        catch
         {
           //Console.WriteLine(ex.ToString());
           this.Dispose();
