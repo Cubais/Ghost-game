@@ -36,38 +36,45 @@ namespace GhostGameClient
 
       byte[] sendData = new byte[byteCount];
 
-      sendData = Encoding.ASCII.GetBytes(nameBox.Text + '}');
+      sendData = Encoding.ASCII.GetBytes(nameBox.Text + '$');
 
       serverStream = client.GetStream();
 
       serverStream.Write(sendData, 0, sendData.Length);
 
       serverStream.Flush();
-
+            
       Thread clientThread = new Thread(getMessage);
       clientThread.Start();
+            
     }   
     private void getMessage()
     {
       while (true)
       {
+        try
+        {
+          serverStream = client.GetStream();
 
-        serverStream = client.GetStream();
+          int buffSize = 0;
 
-        int buffSize = 0;
+          byte[] inStream = new byte[10025];
 
-        byte[] inStream = new byte[10025];
+          buffSize = client.ReceiveBufferSize;
 
-        buffSize = client.ReceiveBufferSize;
+          serverStream.Read(inStream, 0, 255);
 
-        serverStream.Read(inStream, 0, 255);
+          returnData = System.Text.Encoding.ASCII.GetString(inStream);
 
-        returnData = System.Text.Encoding.ASCII.GetString(inStream);
+          if (returnData.IndexOf("@") != -1)
+            playerID = Int32.Parse(returnData.Substring(0, returnData.IndexOf('@')));
 
-        if (returnData.IndexOf("@") != -1)
-          playerID = Int32.Parse(returnData.Substring(0, returnData.IndexOf('@')));
-
-        MessageWrite();
+          MessageWrite();
+        }
+        catch
+        {
+          output.Text = "Server not responding" + Environment.NewLine;
+        }
       }
       
     }
