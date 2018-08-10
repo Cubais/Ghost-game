@@ -55,6 +55,7 @@ namespace GhostGamePlayer
       //File.Create("output.txt");
       //File.WriteAllText("output.txt", JsonConvert.SerializeObject(player, Formatting.Indented));
       this.Close();
+      SendMessage("{Off}");
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -97,9 +98,9 @@ namespace GhostGamePlayer
         g.DrawRectangle(new Pen(Color.Red), new Rectangle(PositionX, PositionY, 50, 50));
         changePosition = false;
 
-        Game.SendMessage(JsonConvert.SerializeObject(this, Formatting.Indented));      
+        Game.SendMessage(JsonConvert.SerializeObject(this, Formatting.Indented));
 
-      }
+      }      
     }
 
     public bool PlayerControl(Keys keyData)
