@@ -11,6 +11,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
+using GhostGamePlayer;
+
 namespace GhostGameClient
 {
   public partial class Form1 : Form
@@ -22,6 +24,9 @@ namespace GhostGameClient
     private TcpClient client = new TcpClient();
     private string returnData;
     private int playerID;
+
+    private bool gameStarted = false;
+    Game newGame;
 
     public Form1()
     {
@@ -67,7 +72,10 @@ namespace GhostGameClient
           returnData = System.Text.Encoding.ASCII.GetString(inStream);
 
           if (returnData.IndexOf("@") != -1)
+          {
             playerID = Int32.Parse(returnData.Substring(0, returnData.IndexOf('@')));
+            continue;
+          }
 
           MessageWrite();
         }
@@ -82,8 +90,10 @@ namespace GhostGameClient
     {
       if (this.InvokeRequired)
         this.Invoke(new MethodInvoker(MessageWrite));
-      else
-        output.Text = output.Text + Environment.NewLine + " >> " + returnData;
+      else if(gameStarted)
+      {
+        newGame.ReceiveMessage(returnData);
+      }
     }
 
     private void Form1_Load(object sender, EventArgs e)
@@ -93,15 +103,15 @@ namespace GhostGameClient
 
     private void StartGame_Click(object sender, EventArgs e)
     {
-      GhostGamePlayer.Game newGame = new GhostGamePlayer.Game(this.serverStream, playerID);
-
+      newGame = new GhostGamePlayer.Game(this.serverStream, playerID);
+      gameStarted = true;
       newGame.Show();
 
     }
 
     private void Form1_FormClosed(object sender, FormClosedEventArgs e)
     {
-      if(serverStream != null)
+      if (serverStream != null)
         serverStream.Close();
 
       Application.Exit();
