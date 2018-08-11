@@ -209,7 +209,7 @@ namespace GhostGameServer
           Console.WriteLine("From client - " + clNo + " : " + dataFromClient);
 
           // Client is disconnected
-          if (dataFromClient == "{Off}")
+          if (dataFromClient == "{Off}" || dataFromClient == "")
           {
             this.Dispose();
             break;
