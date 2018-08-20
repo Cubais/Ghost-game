@@ -16,6 +16,29 @@ using Newtonsoft.Json;
 
 namespace GhostGamePlayer
 {
+  public struct MapPosition
+  {
+    int X { get; set; }
+    int Y { get; set; }
+
+    public MapPosition(int X, int Y)
+    {
+      this.X = X;
+      this.Y = Y;
+    }
+  }
+
+  public abstract class Object
+  {
+    public int PositionX { get; set; }
+    public int PositionY { get; set; }
+
+
+    public MapPosition GetPosition()
+    {
+      return new MapPosition(PositionX,PositionY);
+    }
+  }
   
   public partial class Game : Form
   {
@@ -91,10 +114,8 @@ namespace GhostGamePlayer
     }    
   }
 
-  public class Player
-  {
-    public int PositionX { get; set; }
-    public int PositionY { get; set; }
+  public class Player : Object
+  {    
     public int PlayerID { get; set; }
     
     Form form;    
@@ -114,6 +135,7 @@ namespace GhostGamePlayer
 
     public void Draw()
     {
+      // Draw only if position has changed
       if (changePosition)    {
         g = form.CreateGraphics();
         g.Clear(Color.White);
@@ -158,4 +180,10 @@ namespace GhostGamePlayer
 
     
   }
+}
+
+public class Map
+{
+  List<Object> entities = new List<Object>();
+
 }

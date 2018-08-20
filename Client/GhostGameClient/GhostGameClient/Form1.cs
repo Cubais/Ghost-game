@@ -81,7 +81,7 @@ namespace GhostGameClient
         }
         catch
         {
-          output.Text = "Server not responding" + Environment.NewLine;
+          output.Text = "Server is not responding" + Environment.NewLine;
         }
       }
       
