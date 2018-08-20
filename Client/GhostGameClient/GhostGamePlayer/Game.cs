@@ -28,22 +28,23 @@ namespace GhostGamePlayer
     }
   }
 
-  public abstract class Object
+  public abstract class Entity
   {
     public int PositionX { get; set; }
     public int PositionY { get; set; }
 
 
+    public abstract void Draw(Graphics g);
+
     public MapPosition GetPosition()
     {
-      return new MapPosition(PositionX,PositionY);
+      return new MapPosition(PositionX, PositionY);
     }
   }
-  
+
   public partial class Game : Form
   {
     Player localPlayer;
-    Hashtable players = new Hashtable();
     private static NetworkStream ServerStream;
 
     public Game()
@@ -57,9 +58,9 @@ namespace GhostGamePlayer
       localPlayer = new Player(this, 0, 0, playerID);
       players.Add(playerID, localPlayer);
       ServerStream = serverStream;
-      
+
     }
-    
+
     public void ReceiveMessage(string data)
     {
       Player player = new Player(this, 0, 0, 0);
@@ -88,7 +89,7 @@ namespace GhostGamePlayer
       GameTimer.Enabled = true;
       //this.FormBorderStyle = FormBorderStyle.None;
       //this.WindowState = FormWindowState.Maximized;
-      
+
     }
 
     private void button1_Click(object sender, EventArgs e)
@@ -106,37 +107,32 @@ namespace GhostGamePlayer
 
     private void GameTimer_Tick(object sender, EventArgs e)
     {
-      foreach (DictionaryEntry player in players)
-      {
-        Player playerToDraw = (Player)player.Value;
-        playerToDraw.Draw();
-      }      
-    }    
+      
+    }
   }
 
-  public class Player : Object
-  {    
+  public class Player : Entity
+  {
     public int PlayerID { get; set; }
-    
-    Form form;    
-    Graphics g;
 
+    Form form;
+    
     private bool changePosition = true;
 
 
-    public Player(Form form,int posX,int posY, int playerID)
-    {     
+    public Player(Form form, int posX, int posY, int playerID)
+    {
       this.form = form;
       this.PositionX = posX;
       this.PositionY = posY;
-      g = form.CreateGraphics() ?? null;
       PlayerID = playerID;
     }
 
-    public void Draw()
+    public override void Draw(Graphics g)
     {
       // Draw only if position has changed
-      if (changePosition)    {
+      if (changePosition)
+      {
         g = form.CreateGraphics();
         g.Clear(Color.White);
         g.DrawRectangle(new Pen(Color.Red), new Rectangle(PositionX, PositionY, 50, 50));
@@ -144,31 +140,31 @@ namespace GhostGamePlayer
 
         Game.SendMessage(JsonConvert.SerializeObject(this, Formatting.Indented));
 
-      }      
+      }
     }
 
     public bool PlayerControl(Keys keyData)
     {
       switch (keyData)
       {
-        case Keys.Left:         
-            PositionX -= 5;
-            changePosition = true;
+        case Keys.Left:
+          PositionX -= 5;
+          changePosition = true;
           return true;
 
-        case Keys.Up:          
-            PositionY -= 5;
-            changePosition = true;
+        case Keys.Up:
+          PositionY -= 5;
+          changePosition = true;
           return true;
 
-        case Keys.Right:          
-            PositionX += 5;
-            changePosition = true;
+        case Keys.Right:
+          PositionX += 5;
+          changePosition = true;
           return true;
 
-        case Keys.Down:          
-            PositionY += 5;
-            changePosition = true;
+        case Keys.Down:
+          PositionY += 5;
+          changePosition = true;
           return true;
 
         default:
@@ -178,12 +174,30 @@ namespace GhostGamePlayer
       }
     }
 
-    
+
   }
-}
 
-public class Map
-{
-  List<Object> entities = new List<Object>();
+  public class Map
+  {
+    List<Entity> Entities = new List<Entity>();
 
+    public Map()
+    {
+
+    }
+
+    public void DrawMap(Graphics g)
+    {
+      foreach (var entity in Entities)
+      {
+        entity.Draw(g);
+      }
+    }
+
+    public void AddEntity(Entity e)
+    {
+      Entities.Add(e);
+    }
+
+  }
 }
