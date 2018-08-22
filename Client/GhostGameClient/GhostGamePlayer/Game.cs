@@ -32,7 +32,7 @@ namespace GhostGamePlayer
   {
     public int PositionX { get; set; }
     public int PositionY { get; set; }
-
+    public int EntityID { get; set; }
 
     public abstract void Draw(Graphics g);
 
@@ -46,6 +46,7 @@ namespace GhostGamePlayer
   {
     Player localPlayer;
     private static NetworkStream ServerStream;
+    private Map map;
 
     public Game()
     {
@@ -56,23 +57,18 @@ namespace GhostGamePlayer
     {
       InitializeComponent();
       localPlayer = new Player(this, 0, 0, playerID);
-      players.Add(playerID, localPlayer);
+
+      this.map = new Map(this);
+      map.AddEntity(localPlayer);
       ServerStream = serverStream;
 
     }
 
     public void ReceiveMessage(string data)
     {
-      Player player = new Player(this, 0, 0, 0);
-      var player1 = JsonConvert.DeserializeObject<Player>(data);
-      if (players.ContainsKey(player.PlayerID))
-      {
-        players[player.PlayerID] = player;
-      }
-      else
-      {
-        players.Add(player.PlayerID, player);
-      }
+      var player = JsonConvert.DeserializeObject<Player>(data);
+
+      map.UpdateEntity(player);
 
     }
 
@@ -107,7 +103,7 @@ namespace GhostGamePlayer
 
     private void GameTimer_Tick(object sender, EventArgs e)
     {
-      
+      map.DrawMap();
     }
   }
 
@@ -133,7 +129,6 @@ namespace GhostGamePlayer
       // Draw only if position has changed
       if (changePosition)
       {
-        g = form.CreateGraphics();
         g.Clear(Color.White);
         g.DrawRectangle(new Pen(Color.Red), new Rectangle(PositionX, PositionY, 50, 50));
         changePosition = false;
@@ -179,16 +174,17 @@ namespace GhostGamePlayer
 
   public class Map
   {
-    List<Entity> Entities = new List<Entity>();
+    Hashtable Entities = new Hashtable();
+    Graphics g;
 
-    public Map()
+    public Map(Form form)
     {
-
+      this.g = form.CreateGraphics();
     }
 
-    public void DrawMap(Graphics g)
+    public void DrawMap()
     {
-      foreach (var entity in Entities)
+      foreach (Entity entity in Entities.Values)
       {
         entity.Draw(g);
       }
@@ -196,7 +192,15 @@ namespace GhostGamePlayer
 
     public void AddEntity(Entity e)
     {
-      Entities.Add(e);
+      Entities.Add(e.EntityID, e);
+    }
+
+    public void UpdateEntity(Entity e)
+    {
+      if (Entities.Contains(e.EntityID))
+        Entities.Remove(e.EntityID);
+
+      Entities.Add(e.EntityID, e);
     }
 
   }
