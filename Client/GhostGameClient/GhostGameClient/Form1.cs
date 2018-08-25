@@ -114,7 +114,8 @@ namespace GhostGameClient
       if (serverStream != null)
         serverStream.Close();
 
-      Application.Exit();
+      Application.ExitThread();
+      Environment.Exit(0);
     }
   }
 }

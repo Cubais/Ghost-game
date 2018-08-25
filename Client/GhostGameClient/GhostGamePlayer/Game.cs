@@ -47,6 +47,7 @@ namespace GhostGamePlayer
     Player localPlayer;
     private static NetworkStream ServerStream;
     private Map map;
+    string previousData = "";
 
     public Game()
     {
@@ -66,6 +67,10 @@ namespace GhostGamePlayer
 
     public void ReceiveMessage(string data)
     {
+      if (previousData == data)
+        return;
+
+      previousData = data;
       var player = JsonConvert.DeserializeObject<Player>(data);
 
       map.UpdateEntity(player);
