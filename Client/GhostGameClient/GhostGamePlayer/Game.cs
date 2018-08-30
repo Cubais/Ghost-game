@@ -16,31 +16,6 @@ using Newtonsoft.Json;
 
 namespace GhostGamePlayer
 {
-  public struct MapPosition
-  {
-    int X { get; set; }
-    int Y { get; set; }
-
-    public MapPosition(int X, int Y)
-    {
-      this.X = X;
-      this.Y = Y;
-    }
-  }
-
-  public abstract class Entity
-  {
-    public int PositionX { get; set; }
-    public int PositionY { get; set; }
-    public int EntityID { get; set; }
-
-    public abstract void Draw(Graphics g);
-
-    public MapPosition GetPosition()
-    {
-      return new MapPosition(PositionX, PositionY);
-    }
-  }
 
   public partial class Game : Form
   {
@@ -58,11 +33,9 @@ namespace GhostGamePlayer
     {
       InitializeComponent();
       localPlayer = new Player(this, 0, 0, playerID);
-
-      this.map = new Map(this);
-      map.AddEntity(localPlayer);
+      this.map = new Map(this, localPlayer);
       ServerStream = serverStream;
-
+      this.Text = playerID.ToString();
     }
 
     public void ReceiveMessage(string data)
@@ -72,6 +45,8 @@ namespace GhostGamePlayer
 
       previousData = data;
       var player = JsonConvert.DeserializeObject<Player>(data);
+
+
 
       map.UpdateEntity(player);
 
@@ -107,16 +82,43 @@ namespace GhostGamePlayer
     }
 
     private void GameTimer_Tick(object sender, EventArgs e)
-    {
+    {      
       map.DrawMap();
+    }
+  }
+
+  public struct MapPosition
+  {
+    int X { get; set; }
+    int Y { get; set; }
+
+    public MapPosition(int X, int Y)
+    {
+      this.X = X;
+      this.Y = Y;
+    }
+  }
+
+  public abstract class Entity
+  {
+    public int PositionX { get; set; }
+    public int PositionY { get; set; }
+    public int EntityID { get; set; }
+
+    public abstract void Draw(Graphics g, Color color);
+    public abstract void UpdatePosition(int X, int Y);
+
+    public MapPosition GetPosition()
+    {
+      return new MapPosition(PositionX, PositionY);
     }
   }
 
   public class Player : Entity
   {
-    public int PlayerID { get; set; }
-
     Form form;
+    delegate void StatusChanged();
+    StatusChanged changedLocalPLayer;
     
     private bool changePosition = true;
 
@@ -126,21 +128,24 @@ namespace GhostGamePlayer
       this.form = form;
       this.PositionX = posX;
       this.PositionY = posY;
-      PlayerID = playerID;
+      EntityID = playerID;
     }
 
-    public override void Draw(Graphics g)
+    public void RegisterOnLocalPlayerChange(Map map)
     {
-      // Draw only if position has changed
-      if (changePosition)
-      {
-        g.Clear(Color.White);
-        g.DrawRectangle(new Pen(Color.Red), new Rectangle(PositionX, PositionY, 50, 50));
-        changePosition = false;
+      changedLocalPLayer += map.ChangeStatus;
+    }
 
-        Game.SendMessage(JsonConvert.SerializeObject(this, Formatting.Indented));
+    public override void Draw(Graphics g, Color color)
+    {           
+      g.DrawRectangle(new Pen(color), new Rectangle(PositionX, PositionY, 50, 50));
+    }
 
-      }
+    public override void UpdatePosition(int X, int Y)
+    {
+      PositionX = X;
+      PositionY = Y;
+      changePosition = true;
     }
 
     public bool PlayerControl(Keys keyData)
@@ -150,28 +155,40 @@ namespace GhostGamePlayer
         case Keys.Left:
           PositionX -= 5;
           changePosition = true;
-          return true;
+          break;
 
         case Keys.Up:
           PositionY -= 5;
           changePosition = true;
-          return true;
+          break;
 
         case Keys.Right:
           PositionX += 5;
           changePosition = true;
-          return true;
+          break;
 
         case Keys.Down:
           PositionY += 5;
           changePosition = true;
-          return true;
+          break;
 
         default:
           changePosition = false;
-          return false;
+          break;
 
       }
+      if (changedLocalPLayer != null)
+        changedLocalPLayer.Invoke();
+
+      if (changePosition)
+        SendChange();
+
+      return changePosition;
+    }
+
+    private void SendChange()
+    {
+      Game.SendMessage(JsonConvert.SerializeObject(this, Formatting.Indented));
     }
 
 
@@ -181,17 +198,35 @@ namespace GhostGamePlayer
   {
     Hashtable Entities = new Hashtable();
     Graphics g;
+    Player localPlayer;
 
-    public Map(Form form)
+    bool stateChanged = true;
+
+    public Map(Form form, Player localPlayer)
     {
       this.g = form.CreateGraphics();
+      this.localPlayer = localPlayer;
+      localPlayer.RegisterOnLocalPlayerChange(this);
+    }
+
+    public void ChangeStatus()
+    {
+      stateChanged = true;
     }
 
     public void DrawMap()
     {
+      if (stateChanged)
+      {
+        g.Clear(Color.White);
+        stateChanged = false;
+      }      
+
+      localPlayer.Draw(g, Color.Green);
+
       foreach (Entity entity in Entities.Values)
       {
-        entity.Draw(g);
+        entity.Draw(g, Color.Red);
       }
     }
 
@@ -202,11 +237,18 @@ namespace GhostGamePlayer
 
     public void UpdateEntity(Entity e)
     {
+      if (e.EntityID == localPlayer.EntityID)
+        return;
+
       if (Entities.Contains(e.EntityID))
-        Entities.Remove(e.EntityID);
-
-      Entities.Add(e.EntityID, e);
+      {
+        ((Entity)Entities[e.EntityID]).UpdatePosition(e.PositionX, e.PositionY);
+        stateChanged = true;
+      }
+      else
+      {
+        Entities.Add(e.EntityID, e);
+      }
     }
-
   }
 }

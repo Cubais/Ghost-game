@@ -91,7 +91,7 @@
       this.Controls.Add(this.button1);
       this.Controls.Add(this.nameBox);
       this.Name = "Form1";
-      this.Text = "Form1";
+      this.Text = "Ghost";
       this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
       this.Load += new System.EventHandler(this.Form1_Load);
       this.ResumeLayout(false);

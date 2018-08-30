@@ -93,6 +93,7 @@ namespace GhostGameClient
       else if(gameStarted)
       {
         newGame.ReceiveMessage(returnData);
+        output.Text = returnData;
       }
     }
 
@@ -105,6 +106,7 @@ namespace GhostGameClient
     {
       newGame = new GhostGamePlayer.Game(this.serverStream, playerID);
       gameStarted = true;
+      
       newGame.Show();
 
     }
