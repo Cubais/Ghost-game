@@ -63,6 +63,7 @@
       // 
       // StartGame
       // 
+      this.StartGame.Enabled = false;
       this.StartGame.Image = ((System.Drawing.Image)(resources.GetObject("StartGame.Image")));
       this.StartGame.Location = new System.Drawing.Point(15, 459);
       this.StartGame.Name = "StartGame";

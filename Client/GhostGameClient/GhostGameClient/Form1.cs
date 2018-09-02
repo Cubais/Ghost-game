@@ -35,7 +35,16 @@ namespace GhostGameClient
 
     private void button1_Click(object sender, EventArgs e) //connect to server
     {
-      client = new TcpClient(serverIP, port);
+      try
+      {
+        client = new TcpClient(serverIP, port);
+      }
+      catch
+      {
+        output.Text = "Cannot connect to server";
+        return;
+      }
+      
 
       int byteCount = Encoding.ASCII.GetByteCount(nameBox.Text);
 
@@ -74,6 +83,7 @@ namespace GhostGameClient
           if (returnData.IndexOf("@") != -1)
           {
             playerID = Int32.Parse(returnData.Substring(0, returnData.IndexOf('@')));
+            StartGame.Enabled = true;
             continue;
           }
 
@@ -106,7 +116,6 @@ namespace GhostGameClient
     {
       newGame = new GhostGamePlayer.Game(this.serverStream, playerID);
       gameStarted = true;
-      
       newGame.Show();
 
     }

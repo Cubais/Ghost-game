@@ -23,7 +23,7 @@ namespace GhostGamePlayer
     private static NetworkStream ServerStream;
     private Map map;
     string previousData = "";
-
+    
     public Game()
     {
       InitializeComponent();
@@ -35,7 +35,8 @@ namespace GhostGamePlayer
       localPlayer = new Player(this, 0, 0, playerID);
       this.map = new Map(this, localPlayer);
       ServerStream = serverStream;
-      this.Text = playerID.ToString();
+      this.Text = playerID.ToString();      
+
     }
 
     public void ReceiveMessage(string data)
@@ -61,23 +62,22 @@ namespace GhostGamePlayer
 
     private void Game_Load(object sender, EventArgs e)
     {
-      this.TopMost = true;
+      //this.TopMost = true;
       GameTimer.Enabled = true;
       //this.FormBorderStyle = FormBorderStyle.None;
       //this.WindowState = FormWindowState.Maximized;
 
     }
 
-    private void button1_Click(object sender, EventArgs e)
-    {
-      //File.Create("output.txt");
-      //File.WriteAllText("output.txt", JsonConvert.SerializeObject(player, Formatting.Indented));
-      this.Close();
-      SendMessage("{Off}");
-    }
-
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
+      if (keyData == Keys.Escape)
+      {
+        this.Close();
+        SendMessage("{Off}");
+      }
+        
+
       return (!localPlayer.PlayerControl(keyData)) ? base.ProcessCmdKey(ref msg, keyData) : true;
     }
 
@@ -121,6 +121,8 @@ namespace GhostGamePlayer
     StatusChanged changedLocalPLayer;
     
     private bool changePosition = true;
+
+    Bitmap icon = new Bitmap("ghost.png");
 
 
     public Player(Form form, int posX, int posY, int playerID)
@@ -171,7 +173,8 @@ namespace GhostGamePlayer
           PositionY += 5;
           changePosition = true;
           break;
-
+        case Keys.Escape:
+                  
         default:
           changePosition = false;
           break;
@@ -199,14 +202,22 @@ namespace GhostGamePlayer
     Hashtable Entities = new Hashtable();
     Graphics g;
     Player localPlayer;
+    List<Bitmap> icons = new List<Bitmap>();
+    Bitmap map = new Bitmap("map_final.png");
 
     bool stateChanged = true;
+
+    int canvasWidth;
+    int canvasHeight;
 
     public Map(Form form, Player localPlayer)
     {
       this.g = form.CreateGraphics();
       this.localPlayer = localPlayer;
       localPlayer.RegisterOnLocalPlayerChange(this);
+      canvasHeight = form.ClientSize.Height;
+      canvasWidth = form.ClientSize.Width;
+      LoadMap();            
     }
 
     public void ChangeStatus()
@@ -217,17 +228,18 @@ namespace GhostGamePlayer
     public void DrawMap()
     {
       if (stateChanged)
-      {
-        g.Clear(Color.White);
+      {        
         stateChanged = false;
-      }      
+        g.DrawImage(map, new Rectangle(0, 0, canvasWidth, canvasHeight));  
+        
+      }    
 
       localPlayer.Draw(g, Color.Green);
 
       foreach (Entity entity in Entities.Values)
       {
         entity.Draw(g, Color.Red);
-      }
+      }      
     }
 
     public void AddEntity(Entity e)
@@ -249,6 +261,18 @@ namespace GhostGamePlayer
       {
         Entities.Add(e.EntityID, e);
       }
+    }
+
+    private void LoadMap()
+    {
+      icons.Add(new Bitmap("grass.jpg"));
+      icons.Add(new Bitmap("wall.png"));
+            
+    }
+
+    private void DrawBorders()
+    {
+
     }
   }
 }
