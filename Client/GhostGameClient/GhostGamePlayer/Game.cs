@@ -32,7 +32,7 @@ namespace GhostGamePlayer
     public Game(NetworkStream serverStream, int playerID)
     {
       InitializeComponent();
-      localPlayer = new Player(this, 0, 0, playerID);
+      localPlayer = new Player(this, 50, 50, playerID);
       this.map = new Map(this, localPlayer);
       ServerStream = serverStream;
       this.Text = playerID.ToString();      
@@ -67,6 +67,7 @@ namespace GhostGamePlayer
       //this.FormBorderStyle = FormBorderStyle.None;
       //this.WindowState = FormWindowState.Maximized;
 
+
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -84,6 +85,11 @@ namespace GhostGamePlayer
     private void GameTimer_Tick(object sender, EventArgs e)
     {      
       map.DrawMap();
+    }
+
+    private void Game_Resize(object sender, EventArgs e)
+    {
+     // map.OnResize(this.ClientSize.Width, this.ClientSize.Height);
     }
   }
 
@@ -155,23 +161,51 @@ namespace GhostGamePlayer
       switch (keyData)
       {
         case Keys.Left:
-          PositionX -= 5;
-          changePosition = true;
+          if (PositionX > 50)
+          {
+            PositionX -= 10;
+            changePosition = true;
+          }
+          else
+          {
+            changePosition = false;
+          }
           break;
 
         case Keys.Up:
-          PositionY -= 5;
-          changePosition = true;
+          if (PositionY > 45)
+          {
+            PositionY -= 10;
+            changePosition = true;
+          }
+          else
+          {
+            changePosition = false;
+          }
           break;
 
         case Keys.Right:
-          PositionX += 5;
-          changePosition = true;
+          if (PositionX + 50 < (form.ClientSize.Width - 50))
+          {
+            PositionX += 10;
+            changePosition = true;
+          }
+          else
+          {
+            changePosition = false;
+          }
           break;
 
         case Keys.Down:
-          PositionY += 5;
-          changePosition = true;
+          if (PositionY + 50 < (form.ClientSize.Height - 45))
+          {
+            PositionY += 10;
+            changePosition = true;
+          }
+          else
+          {
+            changePosition = false;
+          }
           break;
         case Keys.Escape:
                   
@@ -234,7 +268,7 @@ namespace GhostGamePlayer
         
       }    
 
-      localPlayer.Draw(g, Color.Green);
+      localPlayer.Draw(g, Color.Blue);
 
       foreach (Entity entity in Entities.Values)
       {
@@ -270,9 +304,10 @@ namespace GhostGamePlayer
             
     }
 
-    private void DrawBorders()
+    public void OnResize(int newWidth, int newHeight)
     {
-
+      canvasWidth = newWidth;
+      canvasHeight = newHeight;
     }
   }
 }

@@ -41,9 +41,14 @@
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.ClientSize = new System.Drawing.Size(1282, 718);
+      this.ControlBox = false;
+      this.MaximizeBox = false;
+      this.MinimizeBox = false;
       this.Name = "Game";
       this.Text = "Form1";
+      this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
       this.Load += new System.EventHandler(this.Game_Load);
+      this.Resize += new System.EventHandler(this.Game_Resize);
       this.ResumeLayout(false);
 
     }
